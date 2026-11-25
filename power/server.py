@@ -304,13 +304,24 @@ def phone_recent_media(kind: str = "images", limit: int = 20) -> list[dict]:
 def phone_pull(remote_path: str, local_path: str) -> str:
     """Copy a file or folder from the phone to this PC."""
     Path(local_path).parent.mkdir(parents=True, exist_ok=True)
-    return _adb("pull", remote_path, local_path, timeout=600).strip()
+    return _transfer("pull", remote_path, local_path)
 
 
 @mcp.tool()
 def phone_push(local_path: str, remote_path: str) -> str:
     """Copy a file or folder from this PC to the phone (e.g. /sdcard/Download/)."""
-    return _adb("push", local_path, remote_path, timeout=600).strip()
+    return _transfer("push", local_path, remote_path)
+
+
+def _transfer(verb: str, src: str, dst: str) -> str:
+    # adb prints the "N file(s) pushed/pulled" summary on stderr on Windows; return both streams.
+    r = subprocess.run([_adb_path(), "-s", _serial(), verb, src, dst], capture_output=True,
+                       timeout=600, stdin=subprocess.DEVNULL)
+    msg = (r.stdout + r.stderr).decode("utf-8", "replace").replace("\r\n", "\n").strip()
+    lines = [l for l in msg.splitlines() if "%]" not in l]  # drop progress lines
+    if r.returncode != 0:
+        raise RuntimeError("\n".join(lines) or f"adb {verb} failed")
+    return "\n".join(lines) or f"{verb} ok"
 
 
 @mcp.tool()
@@ -384,7 +395,8 @@ def phone_open(url: str = "", package: str = "", activity: str = "") -> str:
         cmd = f"monkey -p {_q(package)} -c android.intent.category.LAUNCHER 1"
     else:
         return "give url and/or package"
-    return _sh(cmd).strip()
+    out = _sh(cmd)
+    return "\n".join(l for l in out.splitlines() if l.strip() and not l.lstrip().startswith("bash arg:")).strip()
 
 
 # ================================================================= tools: Chrome DevTools (page DOM)
@@ -467,8 +479,40 @@ def chrome_tabs() -> list[dict]:
 @mcp.tool()
 def chrome_open_tab(url: str) -> dict:
     """Open a URL in a new Chrome tab on the phone."""
-    t = _cdp_json("/json/new?" + urllib.request.quote(url, safe=":/?&=%#"), method="PUT")
-    return {"id": t.get("id"), "url": t.get("url")} if isinstance(t, dict) else {"result": t}
+    import websocket
+
+    before = {t["id"] for t in _cdp_json("/json/list") if t.get("type") == "page"}
+    try:  # Chrome on Android rejects /json/new; use the browser-level Target.createTarget instead.
+        bws = _cdp_json("/json/version")["webSocketDebuggerUrl"]
+        ws = websocket.create_connection(bws, timeout=15, suppress_origin=True)
+        try:
+            ws.send(json.dumps({"id": 1, "method": "Target.createTarget", "params": {"url": url}}))
+            while True:
+                m = json.loads(ws.recv())
+                if m.get("id") == 1:
+                    break
+        finally:
+            ws.close()
+        if "error" in m:
+            raise RuntimeError(m["error"])
+    except Exception:
+        # Fallback: an Android intent asking Chrome for a new tab.
+        _sh("am start -n com.android.chrome/com.google.android.apps.chrome.Main -a android.intent.action.VIEW "
+            f"-d {_q(url)} --ez create_new_tab true --es com.android.browser.application_id com.android.chrome")
+    for _ in range(10):
+        time.sleep(1)
+        new = [t for t in _cdp_json("/json/list") if t.get("type") == "page" and t["id"] not in before]
+        if new:
+            return {"id": new[0]["id"], "url": new[0].get("url")}
+    return {"error": "tab did not appear", "url": url}
+
+
+@mcp.tool()
+def chrome_close_tab(tab: str) -> str:
+    """Close a Chrome tab. `tab` = tab id, or text found in its url/title."""
+    t = _tab(tab)
+    _cdp_json(f"/json/close/{t['id']}")
+    return f"closed {t.get('title')} {t.get('url')}"
 
 
 @mcp.tool()

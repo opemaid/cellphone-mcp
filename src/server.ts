@@ -4,11 +4,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
-import { ChildProcess } from "node:child_process";
+import { ChildProcess, execFileSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 
 import { trace } from "./logger";
-import { AndroidRobot, AndroidDeviceManager } from "./android";
+import { AndroidRobot, AndroidDeviceManager, getAdbPath } from "./android";
 import { ActionableError, Dimensions, GesturePoint, Robot, ScreenshotOptions } from "./robot";
 import { IosManager, IosRobot } from "./ios";
 import { PNG } from "./png";
@@ -1345,9 +1345,27 @@ export const createMcpServer = (): McpServer => {
 			const { process: child, recordingPath, outputPath, startedAt } = recording;
 			activeRecordings.delete(device);
 
-			child.kill("SIGINT");
+			// Cellphone MCP: on Windows, child.kill("SIGINT") is a hard TerminateProcess, so
+			// mobilecli dies before it can pull the video. For Android devices, stop the
+			// on-device screenrecord instead; mobilecli then finalizes, pulls and exits.
+			let stoppedOnDevice = false;
+			if (process.platform === "win32") {
+				try {
+					execFileSync(getAdbPath(), ["-s", device, "shell", "pkill", "-INT", "screenrecord"], { stdio: "ignore", timeout: 10000 });
+					stoppedOnDevice = true;
+				} catch {
+					// not an adb device, or screenrecord already gone: fall back below
+				}
+			}
+			if (!stoppedOnDevice) {
+				child.kill("SIGINT");
+			}
 
 			await new Promise<void>(resolve => {
+				if (child.exitCode !== null || child.signalCode !== null) {
+					resolve();
+					return;
+				}
 				const timeout = setTimeout(() => {
 					child.kill("SIGKILL");
 					resolve();

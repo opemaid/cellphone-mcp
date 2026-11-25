@@ -41,3 +41,15 @@ Environment variables, all optional:
 - `CELLPHONE_SERIAL`: the device to use if more than one is connected
 - `ANDROID_HOME`: where to find platform-tools
 - `CELLPHONE_CDP_PORT`: local port for the Chrome DevTools forward (default 9333)
+
+## Device tests
+
+`power/tests/` contains end-to-end suites that run every tool of both servers against a real phone through an MCP client. Every change they make is reverted: settings are restored, test files deleted, test tabs closed and the test app uninstalled.
+
+```
+set CELLPHONE_SERIAL=<serial from adb devices>
+uv run --with "mcp>=1.2,<2" python power/tests/test_power_device.py
+uv run --with "mcp>=1.2,<2" python power/tests/test_mobile_device.py
+```
+
+They were written against a Redmi Note 14 Pro on HyperOS 3, and the cellphone-mcp suite uses the MIUI Calculator. On another phone, adjust the app-specific parts.
