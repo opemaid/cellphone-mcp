@@ -6,11 +6,12 @@ import os
 import sys
 import tempfile
 import time
+from pathlib import Path
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-POWER = r"C:\Users\tmant\Projects\cellphone-mcp\power"
+POWER = str(Path(__file__).resolve().parents[1])
 APP = "com.miui.compass"
 results = []
 

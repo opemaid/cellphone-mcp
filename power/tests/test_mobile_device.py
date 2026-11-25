@@ -8,11 +8,13 @@ import re
 import sys
 import tempfile
 import time
+from pathlib import Path
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 D = os.environ["CELLPHONE_SERIAL"]
+ROOT = Path(__file__).resolve().parents[2]
 CALC = "com.miui.calculator"
 results = []
 called = set()
@@ -24,9 +26,9 @@ def shape(v):
 
 
 async def main():
-    node = StdioServerParameters(command="node", args=[r"C:\Users\tmant\Projects\cellphone-mcp\lib\index.js"])
+    node = StdioServerParameters(command="node", args=[str(ROOT / "lib" / "index.js")])
     power = StdioServerParameters(command="uv", args=["run", "--quiet", "--directory",
-                                  r"C:\Users\tmant\Projects\cellphone-mcp\power", "--with-requirements",
+                                  str(ROOT / "power"), "--with-requirements",
                                   "requirements.txt", "python", "server.py"])
     async with stdio_client(node) as (r1, w1), stdio_client(power) as (r2, w2):
         async with ClientSession(r1, w1) as m, ClientSession(r2, w2) as p:
