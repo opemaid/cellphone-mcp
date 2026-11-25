@@ -4,6 +4,8 @@ MCP server that lets AI agents (Claude Code, Codex, Gemini, Copilot, or any MCP 
 
 > **Based on [mobile-next/mobile-mcp](https://github.com/mobile-next/mobile-mcp)** (Apache-2.0). Cellphone MCP is an independent fork and is not affiliated with or endorsed by Mobile Next. Changes from upstream: package renamed to `cellphone-mcp` and the CLI/installer strings updated. The original licence is kept in [LICENSE](LICENSE). The upstream documentation below still applies; where it says `@mobilenext/mobile-mcp`, use `cellphone-mcp`.
 
+**Need more than the screen?** [`power/`](power/) contains **cellphone-power**, a companion MCP server for no-root, adb-shell-level access: full notification text, SMS, contacts, call log, files, logcat, settings, app permissions, and Chrome page DOM through DevTools.
+
 ## Install
 
 Claude Code:

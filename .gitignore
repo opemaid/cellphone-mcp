@@ -11,3 +11,4 @@ plugin/.claude-plugin/types
 # mcpb bundles built by scripts/pack-mcpb.sh
 mcpb-build/
 *.mcpb
+__pycache__/
