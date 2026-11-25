@@ -26,7 +26,7 @@ const startHttpServer = async (host: string, port: number) => {
 			jsonrpc: "2.0",
 			error: {
 				code: -32000,
-				message: "SSE transport removed. mobile-mcp now serves MCP Streamable HTTP at /mcp. See https://github.com/mobile-next/mobile-mcp#streamable-http-server-mode",
+				message: "SSE transport removed. cellphone-mcp now serves MCP Streamable HTTP at /mcp. See https://github.com/mobile-next/mobile-mcp#streamable-http-server-mode",
 			},
 			id: null,
 		});
@@ -79,7 +79,7 @@ const startHttpServer = async (host: string, port: number) => {
 	app.delete("/mcp", methodNotAllowed);
 
 	app.listen(port, host, () => {
-		error(`mobile-mcp ${getAgentVersion()} streamable http server listening on http://${host}:${port}/mcp`);
+		error(`cellphone-mcp ${getAgentVersion()} streamable http server listening on http://${host}:${port}/mcp`);
 	});
 };
 
@@ -104,7 +104,7 @@ const startStdioServer = async () => {
 		process.on("SIGINT", shutdown);
 		process.on("SIGTERM", shutdown);
 
-		error(`mobile-mcp ${getAgentVersion()} (mcp sdk ${getSdkVersion()}) server running on stdio`);
+		error(`cellphone-mcp ${getAgentVersion()} (mcp sdk ${getSdkVersion()}) server running on stdio`);
 	} catch (err: any) {
 		console.error("Fatal error in main():", err);
 		error("Fatal error in main(): " + JSON.stringify(err.stack));
@@ -116,10 +116,10 @@ const installIntoDetectedClients = async (options: InstallOptions) => {
 	// add-mcp is ESM-only, loaded lazily so a normal server start does not pay for it
 	const { agents, detectGlobalAgents, upsertServer } = await import("add-mcp");
 	const prompts = await import("@clack/prompts");
-	const config = { command: "npx", args: ["-y", "@mobilenext/mobile-mcp@latest"] };
+	const config = { command: "npx", args: ["-y", "cellphone-mcp@latest"] };
 	const detected = await detectGlobalAgents();
 	if (detected.length === 0) {
-		console.log("No MCP clients detected. See https://github.com/mobile-next/mobile-mcp#installation-and-configuration");
+		console.log("No MCP clients detected. See https://github.com/opemaid/cellphone-mcp#install");
 		return;
 	}
 
@@ -127,7 +127,7 @@ const installIntoDetectedClients = async (options: InstallOptions) => {
 	let selected = detected;
 	if (!options.yes && process.stdin.isTTY) {
 		const answer = await prompts.multiselect({
-			message: "Install mobile-mcp into which clients?",
+			message: "Install cellphone-mcp into which clients?",
 			options: detected.map(agent => ({ value: agent, label: agents[agent].displayName })),
 			initialValues: detected,
 			required: false,
@@ -141,7 +141,7 @@ const installIntoDetectedClients = async (options: InstallOptions) => {
 	}
 
 	for (const agent of selected) {
-		const result = upsertServer(agent, "mobile-mcp", config);
+		const result = upsertServer(agent, "cellphone-mcp", config);
 		if (result.success) {
 			console.log(`✓ ${agents[agent].displayName}: ${result.path}`);
 		} else {
@@ -188,7 +188,7 @@ const main = async () => {
 
 	program
 		.command("install")
-		.description("Add mobile-mcp to the MCP clients detected on this machine")
+		.description("Add cellphone-mcp to the MCP clients detected on this machine")
 		.option("-y, --yes", "Install into every detected client without asking")
 		.action(installIntoDetectedClients);
 

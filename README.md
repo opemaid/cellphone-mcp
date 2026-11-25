@@ -1,3 +1,33 @@
+# Cellphone MCP
+
+MCP server that lets AI agents (Claude Code, Codex, Gemini, Copilot, or any MCP client) drive Android and iOS phones, emulators and simulators: screenshots, accessibility snapshots, taps, typing, swipes, app launch and install.
+
+> **Based on [mobile-next/mobile-mcp](https://github.com/mobile-next/mobile-mcp)** (Apache-2.0). Cellphone MCP is an independent fork and is not affiliated with or endorsed by Mobile Next. Changes from upstream: package renamed to `cellphone-mcp` and the CLI/installer strings updated. The original licence is kept in [LICENSE](LICENSE). The upstream documentation below still applies; where it says `@mobilenext/mobile-mcp`, use `cellphone-mcp`.
+
+## Install
+
+Claude Code:
+
+```
+claude mcp add cellphone -- npx -y cellphone-mcp@latest
+```
+
+Any MCP client (JSON config):
+
+```json
+{
+  "mcpServers": {
+    "cellphone": { "command": "npx", "args": ["-y", "cellphone-mcp@latest"] }
+  }
+}
+```
+
+Android needs `adb` (Android platform-tools) on your PATH or `ANDROID_HOME` set, and a device or emulator showing in `adb devices`.
+
+---
+
+## Upstream documentation
+
 # Mobile Next - MCP server for Mobile Development and Automation | iOS, Android, Simulator, Emulator, and Real Devices
 
 **English** | [日本語](README.ja.md) | [简体中文](README.zh-CN.md)

@@ -34,7 +34,8 @@ const MAX_BATCH_DELAY_MS = 10000;
 const ALLOWED_RECORDING_EXTENSIONS = [".mp4"];
 
 // honors https://consoledonottrack.com as well as our own opt-out
-const isTelemetryDisabled = (): boolean => !!process.env.MOBILEMCP_DISABLE_TELEMETRY || process.env.DO_NOT_TRACK === "1";
+// Cellphone MCP: upstream telemetry (Mobile Next PostHog) is permanently disabled in this fork.
+const isTelemetryDisabled = (): boolean => true;
 const ALLOWED_APP_EXTENSIONS = [".apk", ".ipa", ".zip", ".app"];
 const LOGIN_PROMPT_TIMEOUT_MS = 15000;
 const NO_LOCAL_DEVICES_HINT =
@@ -150,7 +151,7 @@ const describeGesturePoint = (point: GesturePoint): string => {
 export const createMcpServer = (): McpServer => {
 
 	const server = new McpServer({
-		name: "mobile-mcp",
+		name: "cellphone-mcp",
 		version: getAgentVersion(),
 	}, {
 		instructions: SERVER_INSTRUCTIONS,
@@ -282,7 +283,7 @@ export const createMcpServer = (): McpServer => {
 		}
 
 		scarfSent = true;
-		fetch("https://static.scarf.sh/a.png?x-pxid=f238110d-fcbb-479a-bdda-d47716ec4f07").catch(() => {});
+		// Cellphone MCP: upstream Scarf tracking pixel removed.
 	};
 
 	const mobilecli = new Mobilecli();

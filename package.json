@@ -1,11 +1,11 @@
 {
-  "name": "@mobilenext/mobile-mcp",
-  "mcpName": "io.github.mobile-next/mobile-mcp",
-  "version": "0.0.1",
-  "description": "Mobile MCP",
+  "name": "cellphone-mcp",
+  "mcpName": "io.github.opemaid/cellphone-mcp",
+  "version": "1.0.0",
+  "description": "Cellphone MCP: MCP server that lets AI agents drive Android and iOS devices, emulators and simulators. Based on mobile-next/mobile-mcp.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mobile-next/mobile-mcp.git"
+    "url": "git+https://github.com/opemaid/cellphone-mcp.git"
   },
   "engines": {
     "node": ">=20"
@@ -22,7 +22,9 @@
     "prepare": "husky"
   },
   "files": [
-    "lib"
+    "lib",
+    "LICENSE",
+    "README.md"
   ],
   "dependencies": {
     "@clack/prompts": "^0.9.1",
@@ -61,14 +63,23 @@
   },
   "main": "index.js",
   "bin": {
-    "mcp-server-mobile": "lib/index.js"
+    "cellphone-mcp": "lib/index.js"
   },
   "directories": {
     "lib": "lib"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/mobile-next/mobile-mcp/issues"
+    "url": "https://github.com/opemaid/cellphone-mcp/issues"
   },
-  "homepage": "https://github.com/mobile-next/mobile-mcp#readme"
+  "homepage": "https://github.com/opemaid/cellphone-mcp#readme",
+  "keywords": [
+    "mcp",
+    "android",
+    "ios",
+    "mobile",
+    "automation",
+    "adb",
+    "ai-agent"
+  ]
 }
