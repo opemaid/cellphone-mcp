@@ -36,8 +36,9 @@ const listToolNamesWithTelemetry = async (isTelemetryEnabled: boolean): Promise<
 	}
 };
 
-test("get_more_tools is offered when telemetry is enabled", async () => {
-	expect(await listToolNamesWithTelemetry(true)).toContain("get_more_tools");
+// cellphone-mcp: upstream telemetry is permanently disabled, so the env var can't turn it back on
+test("get_more_tools stays unregistered even when the telemetry env var is unset", async () => {
+	expect(await listToolNamesWithTelemetry(true)).not.toContain("get_more_tools");
 });
 
 test("get_more_tools is not registered at all when telemetry is disabled", async () => {

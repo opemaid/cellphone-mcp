@@ -59,7 +59,7 @@ test("serves server/discover for the 2026-07-28 protocol revision", async () => 
 	expect(result.supportedVersions).toContain("2026-07-28");
 	expect(result.capabilities.tools).toBeDefined();
 	expect(result.resultType).toBe("complete");
-	expect(result._meta?.["io.modelcontextprotocol/serverInfo"]?.name).toBe("mobile-mcp");
+	expect(result._meta?.["io.modelcontextprotocol/serverInfo"]?.name).toBe("cellphone-mcp");
 });
 
 test("still serves the legacy initialize handshake through the same handler", async () => {
@@ -77,7 +77,7 @@ test("still serves the legacy initialize handshake through the same handler", as
 	expect(response.status).toBe(200);
 	const result = await readJsonRpcResult(response);
 	expect(result.protocolVersion).toBe("2025-11-25");
-	expect(result.serverInfo.name).toBe("mobile-mcp");
+	expect(result.serverInfo.name).toBe("cellphone-mcp");
 });
 
 test("still serves legacy tools/list statelessly", async () => {

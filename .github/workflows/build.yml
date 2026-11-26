@@ -215,6 +215,8 @@ jobs:
       run: gh release upload "$GITHUB_REF_NAME" mobile-mcp-*.mcpb --clobber --repo "$GITHUB_REPOSITORY"
 
   e2e_test:
+    # upstream ran this on a self-hosted emulator box; this fork has none, so it queued 24h then cancelled
+    if: vars.HAS_SELF_HOSTED_RUNNER == 'true'
     runs-on: self-hosted
     needs: build
     timeout-minutes: 15
